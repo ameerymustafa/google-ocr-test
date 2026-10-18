@@ -9,9 +9,17 @@ app.use(cors());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Locks the file path relative to this exact directory
-process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname, '../OcrApi/credentials.json');
-const client = new vision.ImageAnnotatorClient();
+let client;
+if (process.env.GOOGLE_JSON_KEY) {
+    // Live on Vercel: Read from the secure Vercel vault
+    client = new vision.ImageAnnotatorClient({
+        credentials: JSON.parse(process.env.GOOGLE_JSON_KEY)
+    });
+} else {
+    // Local Testing: Read from the file
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname, '../OcrApi/credentials.json');
+    client = new vision.ImageAnnotatorClient();
+}
 
 app.post('/api/scan', upload.single('imageFile'), async (req, res) => {
     try {
@@ -27,3 +35,4 @@ app.post('/api/scan', upload.single('imageFile'), async (req, res) => {
 });
 
 module.exports = app;
+
