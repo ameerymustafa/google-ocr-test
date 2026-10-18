@@ -36,3 +36,5 @@ app.post('/api/scan', upload.single('imageFile'), async (req, res) => {
 
 module.exports = app;
 
+
+
