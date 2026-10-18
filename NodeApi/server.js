@@ -2,13 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const vision = require('@google-cloud/vision');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-process.env.GOOGLE_APPLICATION_CREDENTIALS = './credentials.json';
+// Locks the file path relative to this exact directory
+process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname, '../OcrApi/credentials.json');
 const client = new vision.ImageAnnotatorClient();
 
 app.post('/api/scan', upload.single('imageFile'), async (req, res) => {
@@ -24,7 +26,4 @@ app.post('/api/scan', upload.single('imageFile'), async (req, res) => {
     }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Node API is actively listening on http://localhost:${PORT}`);
-});
+module.exports = app;

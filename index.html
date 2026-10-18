@@ -46,7 +46,7 @@
                 formData.append('imageFile', blob, 'capture.jpg');
 
                 // Send to your running local server
-                fetch('http://localhost:3000/api/scan', { 
+                fetch('/api/scan', { 
                     method: 'POST',
                     body: formData
                 })
