@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/scan",
+      "destination": "/NodeApi/server.js"
+    }
+  ]
+}

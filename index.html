@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google OCR Scanner</title>
+</head>
+<body>
+    <h2>OCR Ingredient Scanner</h2>
+    
+    <!-- The live video feed -->
+    <video id="camera" autoplay playsinline style="width: 100%; max-width: 400px; border: 2px solid black;"></video>
+    <br><br>
+    
+    <!-- The button to take the picture -->
+    <button id="snap" style="padding: 10px 20px; font-size: 16px;">Take Photo & Scan</button>
+    
+    <!-- Hidden canvas to process the image -->
+    <canvas id="photo" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('photo');
+        const button = document.getElementById('snap');
+
+        // Request access to the webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => {
+                alert("Camera access denied or unavailable.");
+                console.error(error);
+            });
+
+        // Take the picture and send it to the C# API
+        button.addEventListener('click', () => {
+            button.innerText = "Scanning...";
+            
+            // Draw the current video frame
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Convert to file and send
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append('imageFile', blob, 'capture.jpg');
+
+                // Send to your running local server
+                fetch('http://localhost:3000/api/scan', { 
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(text => {
+                    alert("Extracted Text:\n\n" + text);
+                    button.innerText = "Take Photo & Scan";
+                })
+                .catch(error => {
+                    alert("Error connecting to the API. Check the console.");
+                    console.error(error);
+                    button.innerText = "Take Photo & Scan";
+                });
+            }, 'image/jpeg');
+        });
+    </script>
+</body>
+</html>
